@@ -18,6 +18,7 @@ function changeBackground() {
             return;
         }
     }
+    
 document.body.style.backgroundImage = backgroundImages[0].image; 
  }   
 
