@@ -20,7 +20,7 @@ function changeBackground() {
     }
     
 document.body.style.backgroundImage = backgroundImages[0].image; 
- }   
+}   
 
 function getWeather() {
     const city = document.getElementById('city').value;
