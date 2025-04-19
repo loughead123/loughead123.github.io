@@ -18,9 +18,7 @@ function changeBackground() {
             return;
         }
     }
-    document.body.style.backgroundImage = backgroundImages[0].image; 
-}
-
+   
 function getWeather() {
     const city = document.getElementById('city').value;
     const apiUrl = `https://api.openweathermap.org/data/2.5/forecast?q=${city}&units=metric&appid=${apiKey}`;
