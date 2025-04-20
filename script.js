@@ -92,4 +92,4 @@ setInterval(() => {
     if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(showPosition);
     }
-}, 7200000); // 7200000 milliseconds = 2 hours
+}, 7200000); 
