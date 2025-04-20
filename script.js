@@ -1,4 +1,5 @@
 const apiKey = "cc9db6a4457354e1cd3df3c561e6c0eb"; 
+
 const backgroundImages = [
     { time: "06:00", image: "url(images/9ff202b583e066e47c97cbb918efe1dd72233788.jpg)" },
     { time: "12:00", image: "url(images/20051101.jpg)" },
@@ -66,8 +67,7 @@ function showPosition(position) {
                 </div>
             `).join('');
             document.getElementById('hourly-forecast-info').innerHTML = hourlyForecastInfo;
-            
-            
+                        
             const weatherDescription = current.weather[0].description;
             fetch(`https://api.lolimi.cn/API/yyhc/y.php?text=${encodeURIComponent(weatherDescription)}`)
                 .then(response => response.json())
