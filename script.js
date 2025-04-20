@@ -2,64 +2,94 @@ const apiKey = "cc9db6a4457354e1cd3df3c561e6c0eb";
 const backgroundImages = [
     { time: "06:00", image: "url(images/9ff202b583e066e47c97cbb918efe1dd72233788.jpg)" },
     { time: "12:00", image: "url(images/20051101.jpg)" },
-    { time: "18:00", image: "url(images/2009114.jpg)" },
-    { time: "22:00", image: "url(images/2006114.jpg)" }
+    { time: "18:00", image: "url(images/2006114.jpg)" },
+    { time: "22:00", image: "url(images/2009114.jpg)" }
 ];
 
-function changeBackground() {
-    const now = new Date();
-    const hours = now.getHours();
-    const minutes = now.getMinutes();
-    const currentTime = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
+let currentBackgroundIndex = 0;
 
-    for (let i = 0; i < backgroundImages.length; i++) {
-        if (currentTime >= backgroundImages[i].time) {
-            document.body.style.backgroundImage = backgroundImages[i].image;
-            return;
-        }
+document.body.addEventListener('click', () => {
+    currentBackgroundIndex = (currentBackgroundIndex + 1) % backgroundImages.length;
+    document.body.style.backgroundImage = backgroundImages[currentBackgroundIndex].image;
+});
+
+function getLocation() {
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(showPosition);
+    } else {
+        alert("Geolocation is not supported by this browser.");
     }
-    
-document.body.style.backgroundImage = backgroundImages[0].image; 
-}   
+}
 
-function getWeather() {
-    const city = document.getElementById('city').value;
-    const apiUrl = `https://api.openweathermap.org/data/2.5/forecast?q=${city}&units=metric&appid=${apiKey}`;
+function showPosition(position) {
+    const lat = position.coords.latitude;
+    const lon = position.coords.longitude;
+    const apiUrl = `https://api.openweathermap.org/data/2.5/onecall?lat=${lat}&lon=${lon}&exclude=minutely,alerts&units=metric&lang=zh_cn&appid=${apiKey}`;
 
     fetch(apiUrl)
         .then(response => response.json())
         .then(data => {
-            if (data.cod === "200") {
-                const today = data.list[0];
-                const forecast = data.list.filter(item => item.dt_txt.includes("15:00:00")).slice(0, 3);
+            const current = data.current;
+            const daily = data.daily.slice(0, 3);
+            const hourly = data.hourly.slice(0, 24);
 
-                const weatherInfo = `
-                    <h2>Temperature: ${today.main.temp}°C</h2>
-                    <h2>Humidity: ${today.main.humidity}%</h2>
-                    <h2>Wind: ${today.wind.speed} m/s</h2>
-                    <h2>Weather: ${today.weather[0].description}</h2>
-                `;
-                document.getElementById('weather-info').innerHTML = weatherInfo;
+            const weatherInfo = `
+                <h2>当前天气</h2>
+                <p>温度: ${current.temp}°C</p>
+                <p>湿度: ${current.humidity}%</p>
+                <p>风向: ${current.wind_deg}°</p>
+                <p>天气状况: ${current.weather[0].description}</p>
+                <img src="http://openweathermap.org/img/wn/${current.weather[0].icon}@2x.png" alt="Weather icon">
+            `;
+            document.getElementById('weather-info').innerHTML = weatherInfo;
 
-                const forecastInfo = forecast.map(day => `
-                    <div>
-                        <h3>${new Date(day.dt_txt).toLocaleDateString()}</h3>
-                        <p>Temperature: ${day.main.temp_min}°C - ${day.main.temp_max}°C</p>
-                        <p>Humidity: ${day.main.humidity}%</p>
-                        <p>Wind: ${day.wind.speed} m/s</p>
-                        <p>Weather: ${day.weather[0].description}</p>
-                    </div>
-                `).join('');
-                document.getElementById('forecast-info').innerHTML = forecastInfo;
-            } else {
-                document.getElementById('weather-info').innerHTML = `<h2>${data.message}</h2>`;
-            }
+            const forecastInfo = daily.map(day => `
+                <div>
+                    <h3>${new Date(day.dt * 1000).toLocaleDateString('zh-CN')}</h3>
+                    <p>温度范围: ${day.temp.min}°C - ${day.temp.max}°C</p>
+                    <p>湿度: ${day.humidity}%</p>
+                    <p>风向: ${day.wind_deg}°</p>
+                    <p>天气状况: ${day.weather[0].description}</p>
+                    <img src="http://openweathermap.org/img/wn/${day.weather[0].icon}@2x.png" alt="Weather icon">
+                </div>
+            `).join('');
+            document.getElementById('forecast-info').innerHTML = forecastInfo;
+
+            const hourlyForecastInfo = hourly.map(hour => `
+                <div>
+                    <p>${new Date(hour.dt * 1000).toLocaleTimeString('zh-CN')}</p>
+                    <p>温度: ${hour.temp}°C</p>
+                    <p>湿度: ${hour.humidity}%</p>
+                    <p>风向: ${hour.wind_deg}°</p>
+                    <p>天气状况: ${hour.weather[0].description}</p>
+                    <img src="http://openweathermap.org/img/wn/${hour.weather[0].icon}@2x.png" alt="Weather icon">
+                </div>
+            `).join('');
+            document.getElementById('hourly-forecast-info').innerHTML = hourlyForecastInfo;
+
+            
+            const weatherDescription = current.weather[0].description;
+            fetch(`https://api.lolimi.cn/API/yyhc/y.php?text=${encodeURIComponent(weatherDescription)}`)
+                .then(response => response.json())
+                .then(data => {
+                    const audioUrl = data.url;
+                    const audio = new Audio(audioUrl);
+                    audio.play();
+                })
+                .catch(error => {
+                    console.error('Error fetching voice data:', error);
+                });
         })
         .catch(error => {
-            console.error('Error:', error);
+            console.error('Error fetching weather data:', error);
             document.getElementById('weather-info').innerHTML = `<h2>Failed to fetch weather data.</h2>`;
         });
 }
 
-setInterval(changeBackground, 60000); 
-changeBackground(); 
+document.body.style.backgroundImage = backgroundImages[currentBackgroundIndex].image;
+
+setInterval(() => {
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(showPosition);
+    }
+}, 7200000); // 7200000 milliseconds = 2 hours
