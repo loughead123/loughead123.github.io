@@ -66,7 +66,7 @@ function showPosition(position) {
                 </div>
             `).join('');
             document.getElementById('hourly-forecast-info').innerHTML = hourlyForecastInfo;
-
+            
             
             const weatherDescription = current.weather[0].description;
             fetch(`https://api.lolimi.cn/API/yyhc/y.php?text=${encodeURIComponent(weatherDescription)}`)
