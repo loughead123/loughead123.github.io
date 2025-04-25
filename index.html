@@ -1,33 +1,37 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>天气网站</title>
-    <link rel="stylesheet" href="styles.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>天气网站</title>
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <div id="background"></div>
-    <div id="weather-container" class="semi-transparent">
-        <h1 id="city-name">当前城市</h1>
-        <div id="weather-info">
-            <p id="temperature-range">温度范围</p>
-            <p id="humidity">湿度</p>
-            <p id="wind-speed">风速</p>
-            <p id="weather-status">天气状况</p>
-            <img id="weather-icon" src="" alt="天气图标">
+  <div id="background"></div>
+  <div id="weather-container" class="weather-container">
+    <div id="weather-content" class="weather-content">
+      <h1 id="city-name">正在定位...</h1>
+      <div id="current-weather">
+        <img id="weather-icon" src="" alt="天气图标">
+        <div>
+          <p id="temperature">温度：<span id="temp-value">--</span>℃</p>
+          <p id="humidity">湿度：<span id="humidity-value">--</span>%</p>
+          <p id="wind-speed">风速：<span id="wind-value">--</span> km/h</p>
+          <p id="weather-status">天气状况：<span id="status-value">--</span></p>
         </div>
-        <div id="forecast">
-            <h2>三天天气预报</h2>
-            <div id="forecast-container"></div>
-        </div>
-        <div id="hourly-forecast">
-            <h2>24小时天气预报</h2>
-            <div id="hourly-container"></div>
-        </div>
-        <input type="text" id="search-city" placeholder="输入城市名称">
-        <button id="search-button">查询天气</button>
+      </div>
+      <div id="forecast">
+        <h2>未来三天天气预报</h2>
+        <div id="forecast-content"></div>
+      </div>
+      <div id="hourly-forecast">
+        <h2>24小时天气预报</h2>
+        <div id="hourly-content"></div>
+      </div>
+      <input type="text" id="search-city" placeholder="输入城市名称">
+      <button id="search-button">查询天气</button>
     </div>
-    <script src="script.js"></script>
+  </div>
+  <script src="script.js"></script>
 </body>
 </html>
