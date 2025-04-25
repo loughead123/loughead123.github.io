@@ -1,153 +1,123 @@
-const apiKey = "d0f0a13a20ba47a1bbde5f534dd2868b";
-
+const apiKey = 'cc9db6a4457354e1cd3df3c561e6c0eb';
 const backgroundImages = [
-    { time: "06:00", image: "url(images/9ff202b583e066e47c97cbb918efe1dd72233788.jpg)" },
-    { time: "12:00", image: "url(images/20051101.jpg)" },
-    { time: "18:00", image: "url(images/2006114.jpg)" },
-    { time: "22:00", image: "url(images/2009114.jpg)" }
+    '9ff202b583e066e47c97cbb918efe1dd72233788.jpg', '20051101.jpg', '2006114.jpg', '2009114.jpg',
 ];
-
 let currentBackgroundIndex = 0;
 
 setInterval(() => {
+    document.getElementById('background').style.backgroundImage = `url(${backgroundImages[currentBackgroundIndex]})`;
     currentBackgroundIndex = (currentBackgroundIndex + 1) % backgroundImages.length;
-    document.body.style.backgroundImage = backgroundImages[currentBackgroundIndex].image;
 }, 60000);
 
-function getLocation() {
-    if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(showPosition);
-    } else {
-        alert("Geolocation is not supported by this browser.");
+async function getWeather(city) {
+    try {
+        const response = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&lang=zh_cn&units=metric`);
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        console.error('获取天气数据失败:', error);
     }
 }
 
-function showPosition(position) {
-    const lat = position.coords.latitude;
-    const lon = position.coords.longitude;
-    const apiUrl = `https://geoapi.qweather.com/v2/city/lookup?location=${lat},${lon}&key=${apikey}`;
-
-    fetch(apiUrl)
-        .then(response => response.json())
-        .then(data => {
-            const cityId = data.location[0].id;
-            fetchWeatherData(cityId);
-        })
-        .catch(error => {
-            console.error('Error fetching weather data:', error);
-            document.getElementById('weather-info').innerHTML = `<h2>Failed to fetch weather data.</h2>`;
-        });
+async function getForecast(city) {
+    try {
+        const response = await fetch(`https://api.openweathermap.org/data/2.5/forecast?q=${city}&appid=${apiKey}&lang=zh_cn&units=metric`);
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        console.error('获取预报数据失败:', error);
+    }
 }
 
-function searchCity() {
-    const city = document.getElementById('city-search').value;
-    const apiUrl = `https://geoapi.qweather.com/v2/city/lookup?location=${city}&key=${apikey}`;
-
-    fetch(apiUrl)
-        .then(response => response.json())
-        .then(data => {
-            const cityId = data.location[0].id;
-            fetchWeatherData(cityId);
-        })
-        .catch(error => {
-            console.error('Error fetching weather data:', error);
-            document.getElementById('weather-info').innerHTML = `<h2>Failed to fetch weather data.</h2>`;
-        });
+function displayWeather(data) {
+    document.getElementById('city-name').textContent = data.name;
+    document.getElementById('temperature-range').textContent = `温度范围: ${data.main.temp_min}°C - ${data.main.temp_max}°C`;
+    document.getElementById('humidity').textContent = `湿度: ${data.main.humidity}%`;
+    document.getElementById('wind-speed').textContent = `风速: ${data.wind.speed} m/s`;
+    document.getElementById('weather-status').textContent = data.weather[0].description;
+    document.getElementById('weather-icon').src = `https://openweathermap.org/img/wn/${data.weather[0].icon}@2x.png`;
 }
 
-function fetchWeatherData(cityId) {
-    const nowApiUrl = `https://devapi.qweather.com/v7/weather/now?location=${cityId}&key=${apikey}`;
-    const forecastApiUrl = `https://devapi.qweather.com/v7/weather/3d?location=${cityId}&key=${apikey}`;
-    const hourlyApiUrl = `https://devapi.qweather.com/v7/weather/24h?location=${cityId}&key=${apikey}`;
-
-    fetch(nowApiUrl)
-        .then(response => response.json())
-        .then(data => {
-            updateWeatherInfo(data);
-        })
-        .catch(error => {
-            console.error('Error fetching weather data:', error);
-            document.getElementById('weather-info').innerHTML = `<h2>Failed to fetch weather data.</h2>`;
-        });
-
-    fetch(forecastApiUrl)
-        .then(response => response.json())
-        .then(data => {
-            updateForecastInfo(data);
-        })
-        .catch(error => {
-            console.error('Error fetching forecast data:', error);
-            document.getElementById('forecast-info').innerHTML = `<h2>Failed to fetch forecast data.</h2>`;
-        });
-
-    fetch(hourlyApiUrl)
-        .then(response => response.json())
-        .then(data => {
-            updateHourlyForecastInfo(data);
-        })
-        .catch(error => {
-            console.error('Error fetching hourly forecast data:', error);
-            document.getElementById('hourly-forecast-info').innerHTML = `<h2>Failed to fetch hourly forecast data.</h2>`;
-        });
+function displayForecast(data) {
+    const forecastContainer = document.getElementById('forecast-container');
+    forecastContainer.innerHTML = '';
+    data.list.forEach((item, index) => {
+        if (index % 8 === 0) {
+            const forecastItem = document.createElement('div');
+            forecastItem.classList.add('forecast-item');
+            forecastItem.innerHTML = `
+                <p>${new Date(item.dt * 1000).toLocaleDateString()}</p>
+                <p>温度范围: ${item.main.temp_min}°C - ${item.main.temp_max}°C</p>
+                <p>湿度: ${item.main.humidity}%</p>
+                <p>风速: ${item.wind.speed} m/s</p>
+                <p>${item.weather[0].description}</p>
+                <img src="https://openweathermap.org/img/wn/${item.weather[0].icon}@2x.png" alt="Weather icon">
+            `;
+            forecastContainer.appendChild(forecastItem);
+        }
+    });
 }
 
-function updateWeatherInfo(data) {
-    const current = data.now;
-    const weatherInfo = `
-        <h2>当前天气</h2>
-        <p>温度: ${current.temp}°C</p>
-        <p>湿度: ${current.humidity}%</p>
-        <p>风向: ${current.windDir}</p>
-        <p>天气状况: ${current.text}</p>
-        <img src="https://api.qweather.com/v7/weather/icon/${current.icon}.png" alt="Weather icon">
-    `;
-    document.getElementById('weather-info').innerHTML = weatherInfo;
-    
-    const weatherDescription = current.text;
-    fetch(`https://api.lolimi.cn/API/yyhc/y.php?text=${encodeURIComponent(weatherDescription)}`)
-        .then(response => response.json())
-        .then(data => {
-            const audioUrl = data.url;
-            const audio = new Audio(audioUrl);
-            audio.play();
-        })
-        .catch(error => {
-            console.error('Error fetching voice data:', error);
-        });
+function displayHourlyForecast(data) {
+    const hourlyContainer = document.getElementById('hourly-container');
+    hourlyContainer.innerHTML = '';
+    data.list.forEach((item) => {
+        const hourlyItem = document.createElement('div');
+        hourlyItem.classList.add('hourly-item');
+        hourlyItem.innerHTML = `
+            <p>${new Date(item.dt * 1000).toLocaleTimeString()}</p>
+            <p>温度: ${item.main.temp}°C</p>
+            <p>湿度: ${item.main.humidity}%</p>
+            <p>风速: ${item.wind.speed} m/s</p>
+            <p>${item.weather[0].description}</p>
+            <img src="https://openweathermap.org/img/wn/${item.weather[0].icon}@2x.png" alt="Weather icon">
+        `;
+        hourlyContainer.appendChild(hourlyItem);
+    });
 }
 
-function updateForecastInfo(data) {
-    const daily = data.daily.slice(0, 3);
-    const forecastInfo = daily.map(day => `
-        <div>
-            <h3>${new Date(day.fxDate).toLocaleDateString('zh-CN')}</h3>
-            <p>温度范围: ${day.tempMin}°C - ${day.tempMax}°C</p>
-            <p>湿度: ${day.humidity}%</p>
-            <p>风向: ${day.windDir}</p>
-            <p>天气状况: ${day.textDay}</p>
-            <img src="https://api.qweather.com/v7/weather/icon/${day.iconDay}.png" alt="Weather icon">
-        </div>
-    `).join('');
-    document.getElementById('forecast-info').innerHTML = forecastInfo;
-}
-
-function updateHourlyForecastInfo(data) {
-    const hourly = data.hourly.slice(0, 24);
-    const hourlyForecastInfo = hourly.map(hour => `
-        <div>
-            <p>${new Date(hour.fxTime).toLocaleTimeString('zh-CN')}</p>
-            <p>温度: ${hour.temp}°C</p>
-            <p>湿度: ${hour.humidity}%</p>
-            <p>风向: ${hour.windDir}</p>
-            <p>天气状况: ${hour.text}</p>
-            <img src="https://api.qweather.com/v7/weather/icon/${hour.icon}.png" alt="Weather icon">
-        </div>
-    `).join('');
-    document.getElementById('hourly-forecast-info').innerHTML = hourlyForecastInfo;
-}
+document.getElementById('search-button').addEventListener('click', async () => {
+    const city = document.getElementById('search-city').value;
+    if (city) {
+        const weatherData = await getWeather(city);
+        const forecastData = await getForecast(city);
+        displayWeather(weatherData);
+        displayForecast(forecastData);
+        displayHourlyForecast(forecastData);
+    }
+});
 
 setInterval(() => {
-    if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(showPosition);
+    const city = document.getElementById('city-name').textContent;
+    if (city) {
+        getWeather(city).then(displayWeather);
+        getForecast(city).then(displayForecast);
     }
-}, 7200000);
+}, 21600000);
+
+async function speakWeather(weatherStatus) {
+    try {
+        const response = await fetch('https://api.lolimi.cn/API/yyhc/y.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ text: weatherStatus })
+        });
+        const data = await response.json();
+        const audio = new Audio(data.url);
+        audio.play();
+    } catch (error) {
+        console.error('语音播报失败:', error);
+    }
+}
+
+function displayWeather(data) {
+    document.getElementById('city-name').textContent = data.name;
+    document.getElementById('temperature-range').textContent = `温度范围: ${data.main.temp_min}°C - ${data.main.temp_max}°C`;
+    document.getElementById('humidity').textContent = `湿度: ${data.main.humidity}%`;
+    document.getElementById('wind-speed').textContent = `风速: ${data.wind.speed} m/s`;
+    document.getElementById('weather-status').textContent = data.weather[0].description;
+    document.getElementById('weather-icon').src = `https://openweathermap.org/img/wn/${data.weather[0].icon}@2x.png`;
+    speakWeather(data.weather[0].description);
+}
