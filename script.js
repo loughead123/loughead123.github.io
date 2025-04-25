@@ -1,4 +1,4 @@
-const apiKey = "cc9db6a4457354e1cd3df3c561e6c0eb";
+const apiKey = "c6addfbcc3fbd491cfcc47f4b2f04724";
 
 const backgroundImages = [
     { time: "06:00", image: "url(images/9ff202b583e066e47c97cbb918efe1dd72233788.jpg)" },
