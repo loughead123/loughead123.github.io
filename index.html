@@ -1,37 +1,31 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>天气网站</title>
-  <link rel="stylesheet" href="styles.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>智能天气预报</title>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <div id="background"></div>
-  <div id="weather-container" class="weather-container">
-    <div id="weather-content" class="weather-content">
-      <h1 id="city-name">正在定位...</h1>
-      <div id="current-weather">
-        <img id="weather-icon" src="" alt="天气图标">
-        <div>
-          <p id="temperature">温度：<span id="temp-value">--</span>℃</p>
-          <p id="humidity">湿度：<span id="humidity-value">--</span>%</p>
-          <p id="wind-speed">风速：<span id="wind-value">--</span> km/h</p>
-          <p id="weather-status">天气状况：<span id="status-value">--</span></p>
+    <div class="background"></div>
+    <div class="weather-container">
+        <div class="current-weather">
+            <h1>当前天气</h1>
+            <div id="current-weather-info"></div>
         </div>
-      </div>
-      <div id="forecast">
-        <h2>未来三天天气预报</h2>
-        <div id="forecast-content"></div>
-      </div>
-      <div id="hourly-forecast">
-        <h2>24小时天气预报</h2>
-        <div id="hourly-content"></div>
-      </div>
-      <input type="text" id="search-city" placeholder="输入城市名称">
-      <button id="search-button">查询天气</button>
+        <div class="forecast">
+            <h2>未来三天天气预报</h2>
+            <div id="three-day-forecast"></div>
+        </div>
+        <div class="hourly-forecast">
+            <h2>24小时天气预报</h2>
+            <div id="hourly-forecast"></div>
+        </div>
+        <div class="search">
+            <input type="text" id="search-city" placeholder="输入城市名称">
+            <button onclick="searchWeather()">查询</button>
+        </div>
     </div>
-  </div>
-  <script src="script.js"></script>
+    <script src="script.js"></script>
 </body>
 </html>
