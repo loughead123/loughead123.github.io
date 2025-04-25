@@ -10,10 +10,12 @@
     <div class="container">
         <h1>天气预报</h1>
         <button onclick="getLocation()">获取位置</button>
+        <input type="text" id="city-search" placeholder="输入城市名称">
+        <button onclick="searchCity()">搜索</button>
         <div id="weather-info"></div>
         <h2>3-Day Forecast</h2>
         <div id="forecast-info"></div>
-        <h2>Hourly Forecast</h2>
+        <h2>24-Hour Forecast</h2>
         <div id="hourly-forecast-info"></div>
     </div>
     <script src="script.js"></script>
