@@ -25,7 +25,7 @@ function getLocation() {
 function showPosition(position) {
     const lat = position.coords.latitude;
     const lon = position.coords.longitude;
-    const apiUrl = `https://geoapi.qweather.com/v2/city/lookup?location=${lat},${lon}&key=${d0f0a13a20ba47a1bbde5f534dd2868b}`;
+    const apiUrl = `https://geoapi.qweather.com/v2/city/lookup?location=${lat},${lon}&key=${apikey}`;
 
     fetch(apiUrl)
         .then(response => response.json())
@@ -41,7 +41,7 @@ function showPosition(position) {
 
 function searchCity() {
     const city = document.getElementById('city-search').value;
-    const apiUrl = `https://geoapi.qweather.com/v2/city/lookup?location=${city}&key=${d0f0a13a20ba47a1bbde5f534dd2868b}`;
+    const apiUrl = `https://geoapi.qweather.com/v2/city/lookup?location=${city}&key=${apikey}`;
 
     fetch(apiUrl)
         .then(response => response.json())
@@ -56,9 +56,9 @@ function searchCity() {
 }
 
 function fetchWeatherData(cityId) {
-    const nowApiUrl = `https://devapi.qweather.com/v7/weather/now?location=${cityId}&key=${d0f0a13a20ba47a1bbde5f534dd2868b}`;
-    const forecastApiUrl = `https://devapi.qweather.com/v7/weather/3d?location=${cityId}&key=${d0f0a13a20ba47a1bbde5f534dd2868b}`;
-    const hourlyApiUrl = `https://devapi.qweather.com/v7/weather/24h?location=${cityId}&key=${d0f0a13a20ba47a1bbde5f534dd2868b}`;
+    const nowApiUrl = `https://devapi.qweather.com/v7/weather/now?location=${cityId}&key=${apikey}`;
+    const forecastApiUrl = `https://devapi.qweather.com/v7/weather/3d?location=${cityId}&key=${apikey}`;
+    const hourlyApiUrl = `https://devapi.qweather.com/v7/weather/24h?location=${cityId}&key=${apikey}`;
 
     fetch(nowApiUrl)
         .then(response => response.json())
