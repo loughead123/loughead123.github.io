@@ -1,114 +1,125 @@
 const apiKey = 'cc9db6a4457354e1cd3df3c561e6c0eb';
-cconst backgroundImages = [
-    { time: "06:00", image: "url(images/9ff202b583e066e47c97cbb918efe1dd72233788.jpg)" },
-    { time: "12:00", image: "url(images/20051101.jpg)" },
-    { time: "18:00", image: "url(images/2006114.jpg)" },
-    { time: "22:00", image: "url(images/2009114.jpg)" }
+const weatherApiUrl = 'https://api.openweathermap.org/data/2.5/';
+const voiceApiUrl = 'https://api.lolimi.cn/API/yyhc/y.php';
+
+const backgroundImages = [
+    'url(images/9ff202b583e066e47c97cbb918efe1dd72233788.jpg)',
+    'url(images/20051101.jpg)',
+    'url(images/2006114.jpg)',
 ];
 
 let currentBackgroundIndex = 0;
 
-setInterval(() => {
-  document.getElementById('background').style.backgroundImage = `url(${backgroundImages[currentImageIndex]})`;
-  currentImageIndex = (currentImageIndex + 1) % backgroundImages.length;
-}, 60000);
-
-setInterval(fetchWeather, 6 * 60 * 60 * 1000);
-
-navigator.geolocation.getCurrentPosition(position => {
-  const { latitude, longitude } = position.coords;
-  fetchWeather(latitude, longitude);
-}, error => {
-  console.error('定位失败', error);
-  document.getElementById('city-name').innerText = '定位失败，请手动输入城市';
-});
-
-async function fetchWeather(lat, lon) {
-  try {
-    const response = await fetch(`https://api.openweathermap.org/data/2.5/onecall?lat=${lat}&lon=${lon}&exclude=minutely&appid=${apiKey}&lang=zh_cn&units=metric`);
-    const data = await response.json();
-    displayWeather(data);
-    speakWeather(data.current.weather[0].description);
-  } catch (error) {
-    console.error('获取天气失败', error);
-  }
+function changeBackground() {
+    const background = document.querySelector('.background');
+    background.style.backgroundImage = backgroundImages[currentBackgroundIndex];
+    currentBackgroundIndex = (currentBackgroundIndex + 1) % backgroundImages.length;
 }
 
-function displayWeather(data) {
-  const { current, daily, hourly } = data;
-  const cityName = document.getElementById('city-name');
-  const tempValue = document.getElementById('temp-value');
-  const humidityValue = document.getElementById('humidity-value');
-  const windValue = document.getElementById('wind-value');
-  const statusValue = document.getElementById('status-value');
-  const weatherIcon = document.getElementById('weather-icon');
-  const forecastContent = document.getElementById('forecast-content');
-  const hourlyContent = document.getElementById('hourly-content');
+setInterval(changeBackground, 60000);
 
-  tempValue.innerText = current.temp;
-  humidityValue.innerText = current.humidity;
-  windValue.innerText = current.wind_speed;
-  statusValue.innerText = current.weather[0].description;
-  weatherIcon.src = `http://openweathermap.org/img/wn/${current.weather[0].icon}@2x.png`;
-
-  forecastContent.innerHTML = '';
-  daily.slice(1, 4).forEach(day => {
-    const div = document.createElement('div');
-    div.className = 'forecast-item';
-    div.innerHTML = `
-      <p>${new Date(day.dt * 1000).toLocaleDateString('zh-CN')}</p>
-      <p>温度范围：${day.temp.min}℃ - ${day.temp.max}℃</p>
-      <p>湿度：${day.humidity}%</p>
-      <p>风速：${day.wind_speed} km/h</p>
-      <p>天气状况：${day.weather[0].description}</p>
-      <img src="http://openweathermap.org/img/wn/${day.weather[0].icon}@2x.png" alt="Weather icon">
-    `;
-    forecastContent.appendChild(div);
-  });
-
-  hourlyContent.innerHTML = '';
-  hourly.slice(0, 24).forEach(hour => {
-    const div = document.createElement('div');
-    div.className = 'hourly-item';
-    div.innerHTML = `
-      <p>${new Date(hour.dt * 1000).toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' })}</p>
-      <p>温度：${hour.temp}℃</p>
-      <p>湿度：${hour.humidity}%</p>
-      <p>风速：${hour.wind_speed} km/h</p>
-      <p>天气状况：${hour.weather[0].description}</p>
-      <img src="http://openweathermap.org/img/wn/${hour.weather[0].icon}@2x.png" alt="Weather icon">
-    `;
-    hourlyContent.appendChild(div);
-  });
+function getUserLocation() {
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(position => {
+            const { latitude, longitude } = position.coords;
+            fetchWeatherData(latitude, longitude);
+        });
+    } else {
+        alert('Geolocation is not supported by this browser.');
+    }
 }
 
-async function speakWeather(description) {
-  try {
-    const response = await fetch('https://api.lolimi.cn/API/yyhc/y.php', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ text: description })
+function fetchWeatherData(lat, lon) {
+    const currentWeatherUrl = `${weatherApiUrl}weather?lat=${lat}&lon=${lon}&appid=${apiKey}&lang=zh_cn&units=metric`;
+    const forecastUrl = `${weatherApiUrl}forecast?lat=${lat}&lon=${lon}&appid=${apiKey}&lang=zh_cn&units=metric`;
+
+    Promise.all([fetch(currentWeatherUrl), fetch(forecastUrl)])
+        .then(responses => Promise.all(responses.map(res => res.json())))
+        .then(([currentWeather, forecast]) => {
+            displayCurrentWeather(currentWeather);
+            displayThreeDayForecast(forecast);
+            displayHourlyForecast(forecast);
+        })
+        .catch(error => console.error('Error fetching weather data:', error));
+}
+
+function displayCurrentWeather(data) {
+    const currentWeatherInfo = document.getElementById('current-weather-info');
+    currentWeatherInfo.innerHTML = `
+        <h2>${data.name}</h2>
+        <p>温度: ${data.main.temp}°C</p>
+        <p>湿度: ${data.main.humidity}%</p>
+        <p>风速: ${data.wind.speed} m/s</p>
+        <p>天气状况: ${data.weather[0].description}</p>
+    `;
+    playVoice(data.weather[0].description);
+}
+
+function displayThreeDayForecast(data) {
+    const threeDayForecast = document.getElementById('three-day-forecast');
+    threeDayForecast.innerHTML = '';
+    const uniqueDates = new Set(data.list.map(item => new Date(item.dt_txt).toDateString()));
+
+    uniqueDates.forEach(date => {
+        const dailyData = data.list.filter(item => new Date(item.dt_txt).toDateString() === date);
+        const minTemp = Math.min(...dailyData.map(item => item.main.temp_min));
+        const maxTemp = Math.max(...dailyData.map(item => item.main.temp_max));
+        const weatherIcon = dailyData[0].weather[0].icon;
+
+        threeDayForecast.innerHTML += `
+            <div class="forecast-day">
+                <h3>${date}</h3>
+                <img src="http://openweathermap.org/img/wn/${weatherIcon}@2x.png" alt="Weather Icon">
+                <p>温度范围: ${minTemp}°C - ${maxTemp}°C</p>
+                <p>湿度: ${dailyData[0].main.humidity}%</p>
+                <p>风速: ${dailyData[0].wind.speed} m/s</p>
+                <p>天气状况: ${dailyData[0].weather[0].description}</p>
+            </div>
+        `;
     });
-    const audioUrl = await response.json();
-    const audio = new Audio(audioUrl.data.url);
-    audio.play();
-  } catch (error) {
-    console.error('语音播报失败', error);
-  }
 }
 
-document.getElementById('search-button').addEventListener('click', () => {
-  const cityName = document.getElementById('search-city').value;
-  if (cityName) {
-    fetch(`https://api.openweathermap.org/data/2.5/weather?q=${cityName}&appid=${apiKey}&lang=zh_cn&units=metric`)
-      .then(response => response.json())
-      .then(data => {
-        fetchWeather(data.coord.lat, data.coord.lon);
-        document.getElementById('city-name').innerText = cityName;
-      })
-      .catch(error => {
-        console.error('查询失败', error);
-        alert('查询失败，请检查城市名称');
-      });
-  }
-});
+function displayHourlyForecast(data) {
+    const hourlyForecast = document.getElementById('hourly-forecast');
+    hourlyForecast.innerHTML = '';
+    const hourlyData = data.list.filter(item => new Date(item.dt_txt).getHours() % 3 === 0);
+
+    hourlyData.forEach(item => {
+        const time = new Date(item.dt_txt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        const weatherIcon = item.weather[0].icon;
+
+        hourlyForecast.innerHTML += `
+            <div class="hourly-forecast-item">
+                <p>${time}</p>
+                <img src="http://openweathermap.org/img/wn/${weatherIcon}@2x.png" alt="Weather Icon">
+                <p>温度: ${item.main.temp}°C</p>
+            </div>
+        `;
+    });
+}
+
+function playVoice(description) {
+    fetch(`${voiceApiUrl}?text=${encodeURIComponent(description)}`)
+        .then(response => response.json())
+        .then(data => {
+            const audio = new Audio(data.url);
+            audio.play();
+        })
+        .catch(error => console.error('Error fetching voice data:', error));
+}
+
+function searchWeather() {
+    const city = document.getElementById('search-city').value;
+    if (city) {
+        const searchUrl = `${weatherApiUrl}weather?q=${city}&appid=${apiKey}&lang=zh_cn&units=metric`;
+        fetch(searchUrl)
+            .then(response => response.json())
+            .then(data => {
+                displayCurrentWeather(data);
+            })
+            .catch(error => alert('未找到该城市或网络错误'));
+    }
+}
+
+getUserLocation();
+setInterval(fetchWeatherData, 21600000);
