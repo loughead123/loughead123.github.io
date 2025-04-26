@@ -1,31 +1,36 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="zh">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>智能天气预报</title>
+    <title>天气网站</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <div class="background"></div>
-    <div class="weather-container">
+    <div class="container">
+        <div class="header">
+            <h1>天气预报</h1>
+            <input type="text" id="city-search" placeholder="输入城市名称">
+            <button onclick="searchCity()">搜索</button>
+        </div>
         <div class="current-weather">
-            <h1>当前天气</h1>
-            <div id="current-weather-info"></div>
+            <h2 id="city-name"></h2>
+            <p id="weather-description"></p>
+            <img id="weather-icon" src="" alt="天气图标">
+            <p>温度范围：<span id="temp-range"></span></p>
+            <p>湿度：<span id="humidity"></span></p>
+            <p>风速：<span id="wind-speed"></span></p>
         </div>
         <div class="forecast">
-            <h2>未来三天天气预报</h2>
-            <div id="three-day-forecast"></div>
+            <h3>未来三天天气预报</h3>
+            <div id="forecast-container"></div>
         </div>
         <div class="hourly-forecast">
-            <h2>24小时天气预报</h2>
-            <div id="hourly-forecast"></div>
-        </div>
-        <div class="search">
-            <input type="text" id="search-city" placeholder="输入城市名称">
-            <button onclick="searchWeather()">查询</button>
+            <h3>24小时每小时天气预报</h3>
+            <div id="hourly-container"></div>
         </div>
     </div>
+    <audio id="weather-audio" src="" autoplay></audio>
     <script src="script.js"></script>
 </body>
 </html>
