@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>天气网站</title>
+    <title>天气预报</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -20,6 +20,7 @@
             <p>温度范围：<span id="temp-range"></span></p>
             <p>湿度：<span id="humidity"></span></p>
             <p>风速：<span id="wind-speed"></span></p>
+            <button onclick="playWeatherAudio()">播放天气播报</button>
         </div>
         <div class="forecast">
             <h3>未来三天天气预报</h3>
@@ -30,7 +31,7 @@
             <div id="hourly-container"></div>
         </div>
     </div>
-    <audio id="weather-audio" src="" autoplay></audio>
+    <audio id="weather-audio" src="" preload="none"></audio>
     <script src="script.js"></script>
 </body>
 </html>
