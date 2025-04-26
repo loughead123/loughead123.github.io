@@ -10,6 +10,7 @@ let backgroundImages = [
     "url('2010114.jpg')",
     "url('2011114.jpg')"
 ];
+
 let currentBackgroundIndex = 0;
 
 function changeBackground() {
