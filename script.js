@@ -3,12 +3,7 @@ let currentWeather = {};
 let forecastData = [];
 let hourlyData = [];
 let backgroundImages = [
-    "url('9ff202b583e066e47c97cbb918efe1dd72233788.jpg')",
-    "url('20051101.jpg')",
-    "url('2006114.jpg')",
-    "url('2009114.jpg')",
-    "url('2010114.jpg')",
-    "url('2011114.jpg')"
+   '9ff202b583e066e47c97cbb918efe1dd72233788.jpg', '20051101.jpg', '2006114.jpg', '2009114.jpg', '2010114.jig', '2011114.jig',
 ];
 
 let currentBackgroundIndex = 0;
