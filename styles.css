@@ -10,8 +10,9 @@ body {
     max-width: 800px;
     margin: 0 auto;
     padding: 20px;
-    background-color: #fff;
+    background-color: rgba(255, 255, 255, 0.8); /* 半透明背景 */
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
 }
 
 .header {
@@ -36,9 +37,9 @@ body {
 }
 
 .forecast-item, .hourly-item {
-    background-color: #f9f9f9;
+    background-color: rgba(255, 255, 255, 0.8); /* 半透明背景 */
     padding: 10px;
-    border: 1px solid #ddd;
+    border: 1px solid rgba(0, 0, 0, 0.1);
     border-radius: 5px;
     flex: 1 1 calc(33.333% - 10px);
 }
