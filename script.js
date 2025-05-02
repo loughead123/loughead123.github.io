@@ -118,3 +118,5 @@ document.addEventListener('DOMContentLoaded', () => {
   changeBackground();
   setInterval(fetchWeather, 6 * 60 * 60 * 1000, currentCity);
 });
+
+getCurrentLocation();
