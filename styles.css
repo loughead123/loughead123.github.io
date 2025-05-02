@@ -8,20 +8,27 @@ body {
   margin: 0;
   background-image: url('images/20051101.jpg');
   background-size: cover;
+  background-position: center;
   transition: background-image 1s;
 }
 
 .weather-container {
-  background: rgba(255, 255, 255, 0.8);
+  background: rgba(255, 255, 255, 0.7);
   padding: 20px;
   border-radius: 10px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  text-align: center;
 }
 
-.weather-info, .forecast, .hourly-forecast {
-  margin-bottom: 20px;
+#weather-info {
+  margin: 20px 0;
 }
 
-#search-city {
-  margin-right: 10px;
+#forecast {
+  margin-top: 20px;
+}
+
+button {
+  margin: 5px;
+  padding: 10px 20px;
+  font-size: 16px;
 }
