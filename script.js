@@ -7,9 +7,9 @@ let lastWeatherFetch = 0;
 let backgroundIndex = 0;
 
 const backgrounds = [
-  'background20051101.jpg',
-  'background2006114.jpg',
-  'background2009114.jpg',
+  '20051101.jpg',
+  '2006114.jpg',
+  '2009114.jpg',
 ];
 
 function fetchWeather(city) {
