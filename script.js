@@ -6,7 +6,7 @@ let currentCity = CITY;
 let lastWeatherFetch = 0;
 let backgroundIndex = 0;
 
-const backgrounds = [
+const backgroundImages = [
   '20051101.jpg',
   '2006114.jpg',
   '2009114.jpg',
