@@ -40,9 +40,17 @@ function displayWeather(data) {
 function displayForecast(forecastData) {
   const forecast = document.getElementById("forecast");
   forecast.innerHTML = "";
-  const uniqueDates = new Set(forecastData.list.map(item => new Date(item.dt_txt).toDateString()));
+  const today = new Date();
+  const maxDate = new Date(today.getTime() + 3 * 24 * 60 * 60 * 1000);
+  const filteredData = forecastData.list.filter(item => {
+    const date = new Date(item.dt_txt);
+    return date >= today && date <= maxDate;
+  });
+  
+  const uniqueDates = new Set(filteredData.map(item => new Date(item.dt_txt).toDateString()));
+  
   uniqueDates.forEach(date => {
-    const dailyForecast = forecastData.list.filter(item => new Date(item.dt_txt).toDateString() === date);
+    const dailyForecast = filteredData.filter(item => new Date(item.dt_txt).toDateString() === date);
     const dailyItem = document.createElement("div");
     dailyItem.innerHTML = `
       <h3>${date}</h3>
