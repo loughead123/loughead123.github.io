@@ -59,7 +59,7 @@ function displayForecast(forecastData) {
 function displayHourlyForecast(forecastData) {
   const hourlyForecast = document.getElementById("hourly-forecast");
   hourlyForecast.innerHTML = "";
-  const hourlyItems = forecastData.list.slice(0, 24);
+  const hourlyItems = forecastData.list.filter((_, index) => index % 3 === 0 && index < 12);
   const hourlyContainer = document.createElement("div");
   hourlyContainer.style.display = "flex";
   hourlyContainer.style.flexWrap = "wrap";
