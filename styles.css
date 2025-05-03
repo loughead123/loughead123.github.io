@@ -1,6 +1,6 @@
 body {
   font-family: Arial, sans-serif;
-  background-color: #f0f0f0;
+  background-color: transparent;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -19,12 +19,8 @@ body {
   text-align: center;
 }
 
-#weather-info {
+#weather-info, #forecast, #hourly-forecast {
   margin: 20px 0;
-}
-
-#forecast {
-  margin-top: 20px;
 }
 
 button {
