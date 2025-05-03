@@ -40,17 +40,41 @@ function displayWeather(data) {
 function displayForecast(forecastData) {
   const forecast = document.getElementById("forecast");
   forecast.innerHTML = "";
-  forecastData.list.forEach(entry => {
-    const forecastItem = document.createElement("div");
-    forecastItem.innerHTML = `
-      <p>${entry.dt_txt}</p>
-      <p>温度: ${entry.main.temp}°C</p>
-      <p>湿度: ${entry.main.humidity}%</p>
-      <p>天气状况: ${entry.weather[0].description}</p>
-      <img src="http://openweathermap.org/img/wn/${entry.weather[0].icon}@2x.png" alt="Weather Icon">
+  const uniqueDates = new Set(forecastData.list.map(item => new Date(item.dt_txt).toDateString()));
+  uniqueDates.forEach(date => {
+    const dailyForecast = forecastData.list.filter(item => new Date(item.dt_txt).toDateString() === date);
+    const dailyItem = document.createElement("div");
+    dailyItem.innerHTML = `
+      <h3>${date}</h3>
+      <p>温度范围: ${Math.min(...dailyForecast.map(f => f.main.temp_min))}°C - ${Math.max(...dailyForecast.map(f => f.main.temp_max))}°C</p>
+      <p>湿度: ${dailyForecast[0].main.humidity}%</p>
+      <p>风速: ${dailyForecast[0].wind.speed} m/s</p>
+      <p>天气状况: ${dailyForecast[0].weather[0].description}</p>
+      <img src="http://openweathermap.org/img/wn/${dailyForecast[0].weather[0].icon}@2x.png" alt="Weather Icon">
     `;
-    forecast.appendChild(forecastItem);
+    forecast.appendChild(dailyItem);
   });
+}
+
+function displayHourlyForecast(forecastData) {
+  const hourlyForecast = document.getElementById("hourly-forecast");
+  hourlyForecast.innerHTML = "";
+  const hourlyItems = forecastData.list.slice(0, 24);
+  const hourlyContainer = document.createElement("div");
+  hourlyContainer.style.display = "flex";
+  hourlyContainer.style.flexWrap = "wrap";
+  hourlyItems.forEach(item => {
+    const hourlyItem = document.createElement("div");
+    hourlyItem.style.margin = "10px";
+    hourlyItem.innerHTML = `
+      <p>${new Date(item.dt_txt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</p>
+      <p>温度: ${item.main.temp}°C</p>
+      <p>天气状况: ${item.weather[0].description}</p>
+      <img src="http://openweathermap.org/img/wn/${item.weather[0].icon}@2x.png" alt="Weather Icon">
+    `;
+    hourlyContainer.appendChild(hourlyItem);
+  });
+  hourlyForecast.appendChild(hourlyContainer);
 }
 
 function playWeather() {
@@ -77,7 +101,10 @@ document.getElementById("search-btn").addEventListener("click", () => {
   if (city) {
     currentCity = city;
     getWeather(city).then(displayWeather);
-    getForecast(city).then(displayForecast);
+    getForecast(city).then(data => {
+      displayForecast(data);
+      displayHourlyForecast(data);
+    });
   }
 });
 
@@ -90,7 +117,10 @@ if ("geolocation" in navigator) {
         currentCity = data.name;
         document.getElementById("location").innerText = `当前城市: ${currentCity}`;
         displayWeather(data);
-        getForecast(currentCity).then(displayForecast);
+        getForecast(currentCity).then(data => {
+          displayForecast(data);
+          displayHourlyForecast(data);
+        });
       });
   });
 } else {
@@ -99,5 +129,8 @@ if ("geolocation" in navigator) {
 
 setInterval(() => {
   getWeather(currentCity).then(displayWeather);
-  getForecast(currentCity).then(displayForecast);
+  getForecast(currentCity).then(data => {
+    displayForecast(data);
+    displayHourlyForecast(data);
+  });
 }, 21600000);
