@@ -41,7 +41,7 @@ function displayForecast(forecastData) {
   const forecast = document.getElementById("forecast");
   forecast.innerHTML = "";
   const today = new Date();
-  const maxDate = new Date(today.getTime() + 3 * 24 * 60 * 60 * 1000);
+  const maxDate = new Date(today.getTime() + 1 * 24 * 60 * 60 * 1000);
   const filteredData = forecastData.list.filter(item => {
     const date = new Date(item.dt_txt);
     return date >= today && date <= maxDate;
